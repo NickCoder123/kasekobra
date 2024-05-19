@@ -2,8 +2,8 @@
 
 import { cn } from "~/lib/utils";
 import { useUploadThing } from "~/lib/uploadthing";
-import { Progress } from "~/components/ui/progress";
-import { useToast } from "~/components/ui/use-toast";
+import { Progress } from "~/ui/progress";
+import { useToast } from "~/ui/use-toast";
 
 import { useState, useTransition } from "react";
 import Dropzone, { FileRejection } from "react-dropzone";
