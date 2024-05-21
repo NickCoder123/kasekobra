@@ -73,7 +73,7 @@ export async function createCheckoutSession({
     payment_method_types: ["card"],
     mode: "payment",
     shipping_address_collection: {
-      allowed_countries: ["IN"],
+      allowed_countries: ["IN", "DE", "US"],
     },
     metadata: {
       userId: user.id,
