@@ -4,6 +4,10 @@ import { db } from "~/db";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { Resend } from "resend";
+import { OrderReceivedEmail } from "~/components/emails/OrderRecievedEmail";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
       const billingAddress = session.customer_details!.address;
       const shippingAdress = session.shipping_details!.address;
 
-      await db.order.update({
+      const updatedOrder = await db.order.update({
         where: {
           id: orderId,
         },
@@ -52,7 +56,7 @@ export async function POST(req: Request) {
               country: shippingAdress!.country!,
               postalCode: shippingAdress!.postal_code!,
               street: shippingAdress!.line1!,
-              state: shippingAdress!.state!,
+              state: shippingAdress!.state,
             },
           },
           billingAddress: {
@@ -62,10 +66,29 @@ export async function POST(req: Request) {
               country: billingAddress!.country!,
               postalCode: billingAddress!.postal_code!,
               street: billingAddress!.line1!,
-              state: billingAddress!.state!,
+              state: billingAddress!.state,
             },
           },
         },
+      });
+
+      await resend.emails.send({
+        from: "KaseKobra <nikunjmehra935@gmail.com>",
+        to: [event.data.object.customer_details.email],
+        subject: "Thank you for your purchase!",
+        react: OrderReceivedEmail({
+          orderId,
+          orderDate: updatedOrder.createdAt.toLocaleDateString(),
+          // @ts-ignore
+          shippingAddress: {
+            name: session.customer_details!.name!,
+            city: shippingAdress!.city!,
+            country: shippingAdress!.country!,
+            postalCode: shippingAdress!.postal_code!,
+            street: shippingAdress!.line1!,
+            state: shippingAdress!.state,
+          },
+        }),
       });
     }
 
