@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -12,4 +13,35 @@ export function formatPrice(price: number) {
   });
 
   return formatter.format(price);
+}
+
+export function constructMetadata({
+  title = "KaseKobra - custom high-quality phone cases",
+  description = "Create custom high-quality phone cases in seconds",
+  image = "/thumbnail.png",
+  icons = "/favicon.ico",
+}: {
+  title?: string;
+  description?: string;
+  image?: string;
+  icons?: string;
+} = {}): Metadata {
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: image }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [{ url: image }],
+      creator: "@nickpotter69",
+    },
+    icons,
+    metadataBase: new URL("https://kasekobra.vercel.app/"),
+  };
 }
